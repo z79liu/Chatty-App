@@ -6,7 +6,7 @@ A minimal and light dev environment for ReactJS.
 ### Usage
 
 Clone the boilerplate and create your own git repo.
-
+  
 ```
 git clone git@github.com:lighthouse-labs/react-simple-boilerplate.git
 cd react-simple-boilerplate
