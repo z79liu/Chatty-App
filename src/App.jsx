@@ -22,10 +22,16 @@ class App extends Component {
       ]
     }
     this.addMessage = this.addMessage.bind(this);
+    this.sendMsg = this.sendMsg.bind(this);
+
 
 
   }
-  
+
+  sendMsg(msg) {
+    const newmsg = {username: this.state.currentUser.name, content: msg}
+    this.socket.send(JSON.stringify(newmsg));
+  }
 
   componentDidMount() {
     console.log("componentDidMount <App />");
@@ -44,7 +50,6 @@ class App extends Component {
     // This event listener is fired when the socket is opened (i.e. connected)
     this.socket.onopen = () => {
       console.log('Connected to server');
-      this.socket.send('hello')
     };
 
     
@@ -73,7 +78,7 @@ class App extends Component {
     <div>
       {/* <h1>Hello React :)</h1> */}
       <MessageList messageList = {this.state.messages}/>
-      <ChatBar addMessage = {this.addMessage} currentUser = {this.state.currentUser.name}/>
+      <ChatBar sendMsg = {this.sendMsg} addMessage = {this.addMessage} currentUser = {this.state.currentUser.name}/>
     </div>
     );
   }

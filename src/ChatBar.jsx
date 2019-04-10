@@ -8,8 +8,9 @@ class ChatBar extends Component {
 
   keyPress(e){
     if(e.charCode == 13){
-       console.log('value', e.target.value);
+      //  console.log('value', e.target.value);
        this.props.addMessage(e.target.value)
+       this.props.sendMsg(e.target.value)
        e.target.value = ""
     }
  }
