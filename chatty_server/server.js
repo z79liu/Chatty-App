@@ -27,20 +27,32 @@ const wss = new WebSocket.Server({ server });
 wss.broadcast = data => {
   wss.clients.forEach(ws => {
     if (ws.readyState === WebSocket.OPEN) {
-      console.log('hello')
       ws.send(data);
     }
   });
 };
 
 wss.on('connection', (ws) => {
+
   console.log('Client connected');
   ws.on('message', data => {
     const json = JSON.parse(data)
-    const objToBroadcast = {id: uuid(), username: json.username, content: json.content}
-    console.log(`user ${json.username} said ${json.content} `)
-    wss.broadcast(JSON.stringify(objToBroadcast))
-  // Set up a callback for when a client closes the socket. This usually means they closed their browser.
-  ws.on('close', () => console.log('Client disconnected'));
+    console.log('server received message', json)
+    switch (json.type) {
+      case "postMessage":
+        let objToBroadcast = { id: uuid(), type: "incomingMessage", username: json.username, content: json.content }
+        wss.broadcast(JSON.stringify(objToBroadcast))
+        break;
+      case "postNotification":
+        let objToBroadcast2 = { type: "incomingNotification", content: json.content }
+        wss.broadcast(JSON.stringify(objToBroadcast2))
+        break;
+    }
+
+    // Set up a callback for when a client closes the socket. This usually means they closed their browser.
+    ws.on('close', () => {
+
+      console.log('Client disconnected');
+    })
   });
 })

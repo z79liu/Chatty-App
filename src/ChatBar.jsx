@@ -10,6 +10,7 @@ class ChatBar extends Component {
   render() {
     return (
     <footer className="chatbar">
+      {/* when name field is out of focus, run the props that changes the state of currentuser */}
       <input className="chatbar-username" placeholder="Your Name (Optional)" onBlur={this.nameChange}/>
       <input className="chatbar-message" placeholder="Type a message and hit ENTER" onKeyPress={( e )=> this.keyPress(e) }/>
     </footer>
@@ -21,18 +22,14 @@ class ChatBar extends Component {
       //  console.log('value', e.target.value);
       //  this.props.addMessage(e.target.value)
       //  console.log('pressed enter',this.refs.myInput.value)
-       this.props.changeName("")
        this.props.sendMsg(e.target.value)
        e.target.value = ""
     }
   }
 
   nameChange = (e) => {
-    this.props.changeName(e.target.value)
-    console.log("out of focus")
+    this.props.nameChange(e.target.value)
   }
-
-
 
 }
 export default ChatBar;

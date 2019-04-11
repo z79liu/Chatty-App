@@ -19,7 +19,7 @@ class App extends Component {
     setTimeout(() => {
       console.log("Simulating incoming message");
       // Add a new message to the list of messages in the data store
-      const newMessage = {id: 3, username: "Zeyu", content: "Hello Welcome to my Chat app built on React and WebSocket!"};
+      const newMessage = {type: "incomingMessage", id: 3, username: "Zeyu", content: "Hello Welcome to my Chat app built on React and WebSocket!"};
       const messages = this.state.messages.concat(newMessage)
       // Update the state of the app component.
       // Calling setState will trigger a call to render() in App and all child components.
@@ -36,8 +36,23 @@ class App extends Component {
     
     // This event listener is fired whenever the socket receives a message from the server
     // The parameter e is a MessageEvent which contains the message from the server along with some metadata.
-    this.socket.onmessage = this._handleServerMessage
+    this.socket.onmessage = (event) => {
+      const message = JSON.parse(event.data);
+      console.log('this is the parsed response from server', message)
+      switch (message.type) {
+        case "incomingMessage":
+          this._handleServerMessage(message)
+          break;
+        case "incomingNotification":
+          this._handleServerNotification(message)
+          break;
+        default:
+          // show an error in the console if the message type is unknown
+          throw new Error("Unknown event type " + data.type);
+      }
+    }
 
+    
     // This event listener is fired when the socket is closed (either by us or the server)
     this.onclose = () => {
       console.log('Client disconnected');
@@ -47,37 +62,50 @@ class App extends Component {
 
 
   render() {
-
     return (
     <div>
       {/* <h1>Hello React :)</h1> */}
       <MessageList messageList = {this.state.messages}/>
-      <ChatBar changeName= {this.changeName} sendMsg = {this.sendMsg} currentUser = {this.state.currentUser.name}/>
+      <ChatBar nameChange= {this.nameChange} sendMsg = {this.sendMsg} currentUser = {this.state.currentUser.name}/>
     </div>
     );
   }
 
   sendMsg(msg) {
-    const newmsg = {username: this.state.currentUser.name, content: msg}
+    const user = this.state.currentUser.name === undefined ? "Anonymous" : this.state.currentUser.name
+    console.log('my name is', user)
+    const newmsg = { type: "postMessage", username: user, content: msg}
     this.socket.send(JSON.stringify(newmsg));
   }
 
  
  _handleServerMessage = e => {
     // TODO: Handle message from server
-    console.log('received message from server')
-    const message = JSON.parse(e.data);
-
-    this.setState({ messages: [...this.state.messages, message] });
+    this.setState({ messages: [...this.state.messages, e] });
   };
 
-  changeName = (input) => {
-    if (input === ""){
-    console.log('running line 76')
+  _handleServerNotification = e => {
+    // TODO: Handle message from server
+    this.setState({ messages: [...this.state.messages, e] });
+  };
 
-      this.setState({currentUser: {name: "Anonymous" }})
+  // _systemnotif = e => {
+  //   const currentUser = this.state.currentUser.name === undefined ? "Anonymous" : this.state.currentUser.name
+  //   const newmsg = { type: "postNotification", username: e, content: msg}
+  //   this.socket.send(JSON.stringify(newmsg));
+  // }
+
+
+  nameChange = (input) => {
+    if (input === "") {
+      this.setState({ currentUser: { name: "Anonymous" } })
+    } else if (input !== this.state.currentUser.name) {
+      const user = this.state.currentUser.name === undefined ? "Anonymous" : this.state.currentUser.name
+      const notif = { type: "postNotification", content: `${user} has changed their name to ${input}` }
+      this.socket.send(JSON.stringify(notif));
+      this.setState({ currentUser: { name: input } })
     } else {
-    this.setState({currentUser: {name: input }})
+
     }
   }
 
