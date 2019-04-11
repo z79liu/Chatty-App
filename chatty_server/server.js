@@ -22,7 +22,7 @@ const wss = new WebSocket.Server({ server });
 // Set up a callback that will run when a client connects to the server
 // When a client connects they are assigned a socket, represented by
 // the ws parameter in the callback.
-const colors = ["#006400", "#800000", "#000080", "#2F4F4F"]
+const colors = ["#4B0082	", "#A9A9A9", "#FF0000", "#3CB371"]
 function getRandomInt(x, y) {
   return Math.floor(Math.random() * (y - x + 1)) + x;
 }
@@ -50,7 +50,7 @@ wss.on('connection', (ws) => {
     console.log('server received message', json)
     switch (json.type) {
       case "postMessage":
-        let objToBroadcast = { id: uuid(), type: "incomingMessage", username: json.username, content: json.content }
+        let objToBroadcast = { id: uuid(), type: "incomingMessage", username: json.username, content: json.content, color: json.color }
         wss.broadcast(JSON.stringify(objToBroadcast))
         break;
       case "postNotification":

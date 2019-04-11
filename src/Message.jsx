@@ -2,10 +2,10 @@ import React, { Component } from 'react';
 
 class Message extends React.Component {
   render() {
+    console.log(this.state)
     const style = {
       color: this.props.color
     }
-    console.log('this the color at final stage', this.props.color)
     if (this.props.type === "incomingMessage") {
       return (
         <div className="message">

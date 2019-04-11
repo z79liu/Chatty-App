@@ -40,10 +40,9 @@ class App extends Component {
     // This event listener is fired whenever the socket receives a message from the server
     // The parameter e is a MessageEvent which contains the message from the server along with some metadata.
     this.socket.onmessage = (event) => {
-      console.log('server sent a message:',event)
       const sessions = JSON.parse(event.data);
       if (sessions.activeUsers) {
-        console.log('this is the current active users', sessions.activeUsers)
+  
         this._activeUsers(sessions.activeUsers)
       } else if (sessions.color) {
         console.log('got the color from server', sessions.color)
@@ -88,8 +87,8 @@ class App extends Component {
 
   sendMsg(msg) {
     const user = this.state.currentUser.name === undefined ? "Anonymous" : this.state.currentUser.name
-    console.log('my name is', user)
-    const newmsg = { type: "postMessage", username: user, content: msg }
+    const newmsg = { type: "postMessage", username: user, content: msg, color: this.state.color }
+    console.log("this is the message", newmsg)
     this.socket.send(JSON.stringify(newmsg));
   }
 
@@ -97,6 +96,7 @@ class App extends Component {
     this.setState({ activeUsers: users });
     console.log('current active users', this.state.activeUsers)
   }
+
   _changecolor = (color) => {
     this.setState({ color: color });
     console.log('setting the app state color to ', this.state.color)
