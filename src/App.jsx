@@ -89,7 +89,8 @@ class App extends Component {
   sendMsg(msg) {
     const user = this.state.currentUser.name === undefined ? "Anonymous" : this.state.currentUser.name
     console.log('my name is', user)
-    const newmsg = { type: "postMessage", username: user, content: msg }
+    const newmsg = { color: this.state.color, type: "postMessage", username: user, content: msg }
+    console.log(newmsg)
     this.socket.send(JSON.stringify(newmsg));
   }
 
