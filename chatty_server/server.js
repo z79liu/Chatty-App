@@ -11,9 +11,9 @@ const PORT = 3001;
 
 // Create a new express server
 const server = express()
-   // Make the express server serve static assets (html, javascript, css) from the /public folder
+  // Make the express server serve static assets (html, javascript, css) from the /public folder
   .use(express.static('public'))
-  .listen(PORT, '0.0.0.0', 'localhost', () => console.log(`Listening on ${ PORT }`));
+  .listen(PORT, '0.0.0.0', 'localhost', () => console.log(`Listening on ${PORT}`));
 
 // Create the WebSockets server
 const wss = new WebSocket.Server({ server });
@@ -22,7 +22,10 @@ const wss = new WebSocket.Server({ server });
 // Set up a callback that will run when a client connects to the server
 // When a client connects they are assigned a socket, represented by
 // the ws parameter in the callback.
-
+const colors = ["#006400", "#800000", "#000080", "#2F4F4F"]
+function getRandomInt(x, y) {
+  return Math.floor(Math.random() * (y - x + 1)) + x;
+}
 
 wss.broadcast = data => {
   wss.clients.forEach(ws => {
@@ -35,7 +38,11 @@ wss.broadcast = data => {
 wss.on('connection', (ws) => {
   console.log('current active sessions', wss.clients.size)
   console.log('Client connected');
-  let activeUsers = {activeUsers: wss.clients.size }
+  let activeUsers = { activeUsers: wss.clients.size }
+  let color = { color: colors[getRandomInt(0, 3)] }
+  console.log('server generated a random color, it is:', color)
+
+  ws.send(JSON.stringify(color));
   wss.broadcast(JSON.stringify(activeUsers))
 
   ws.on('message', data => {
@@ -51,11 +58,12 @@ wss.on('connection', (ws) => {
         wss.broadcast(JSON.stringify(objToBroadcast2))
         break;
     }
-
-    // Set up a callback for when a client closes the socket. This usually means they closed their browser.
-    ws.on('close', () => {
-      console.log('current active sessions', wss.clients.size)
-      console.log('Client disconnected');
-    })
   });
+  // Set up a callback for when a client closes the socket. This usually means they closed their browser.
+  ws.on('close', () => {
+    let activeUsers = { activeUsers: wss.clients.size }
+    console.log('Client disconnected remaining active users are:',activeUsers );
+    wss.broadcast(JSON.stringify(activeUsers))
+  })
+
 })

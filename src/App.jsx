@@ -10,7 +10,8 @@ class App extends Component {
     this.state = {
       currentUser: {}, // optional. if currentUser is not defined, it means the user is Anonymous
       messages: [],
-      activeUsers: 0
+      activeUsers: 0,
+      color: ""
     }
 
     this.sendMsg = this.sendMsg.bind(this);
@@ -44,7 +45,11 @@ class App extends Component {
       if (sessions.activeUsers) {
         console.log('this is the current active users', sessions.activeUsers)
         this._activeUsers(sessions.activeUsers)
-      } else {
+      } else if (sessions.color) {
+        console.log('got the color from server', sessions.color)
+        this._changecolor(sessions.color)
+      } 
+      else {
         const message = JSON.parse(event.data);
         console.log('this is the parsed response from server', message)
         switch (message.type) {
@@ -75,7 +80,7 @@ class App extends Component {
       <div>
         {/* <h1>Hello React :)</h1> */}
         <NavBar activeUsers= {this.state.activeUsers}/>
-        <MessageList messageList={this.state.messages} />
+        <MessageList messageList={this.state.messages} color={this.state.color} />
         <ChatBar nameChange={this.nameChange} sendMsg={this.sendMsg} currentUser={this.state.currentUser.name} />
       </div>
     );
@@ -91,6 +96,10 @@ class App extends Component {
   _activeUsers = (users) => {
     this.setState({ activeUsers: users });
     console.log('current active users', this.state.activeUsers)
+  }
+  _changecolor = (color) => {
+    this.setState({ color: color });
+    console.log('setting the app state color to ', this.state.color)
   }
 
   _handleServerMessage = e => {
