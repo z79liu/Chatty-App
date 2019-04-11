@@ -39,6 +39,7 @@ class App extends Component {
     // This event listener is fired whenever the socket receives a message from the server
     // The parameter e is a MessageEvent which contains the message from the server along with some metadata.
     this.socket.onmessage = (event) => {
+      console.log('server sent a message:',event)
       const sessions = JSON.parse(event.data);
       if (sessions.activeUsers) {
         console.log('this is the current active users', sessions.activeUsers)
@@ -58,7 +59,6 @@ class App extends Component {
             throw new Error("Unknown event type " + data.type);
         }
       }
-
     }
 
 

@@ -36,7 +36,8 @@ wss.on('connection', (ws) => {
   console.log('current active sessions', wss.clients.size)
   console.log('Client connected');
   let activeUsers = {activeUsers: wss.clients.size }
-  ws.send(JSON.stringify(activeUsers))
+  wss.broadcast(JSON.stringify(activeUsers))
+
   ws.on('message', data => {
     const json = JSON.parse(data)
     console.log('server received message', json)
