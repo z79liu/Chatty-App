@@ -1,27 +1,36 @@
-React Boilerplate
+Chat App
 =====================
 
-A minimal and light dev environment for ReactJS.
+A client-side SPA (single-page app) built with ReactJS, Webpack, Babel, Node.js and Web Sockets. The client-side app communicates with a server via WebSockets for multi-user real-time updates. No persistent database is involved; the focus is on the client-side experience and using ReactJS for real time updates.
 
-### Usage
+## Features
+When any connected user sends a chat message, all connected users receive and display the message
+When any connected user changes their name, all connected users are notified of the name change
+Notifications are styled differently from chat messages
+Header will display the count of connected users
+When the number of connected users changes, this count will be updated for all connected users in real time
+Different users' names will each be coloured differently, and the color stays then same even if they change their name.
 
-Clone the boilerplate and create your own git repo.
-  
-```
-git clone git@github.com:lighthouse-labs/react-simple-boilerplate.git
-cd react-simple-boilerplate
-git remote rm origin
-git remote add origin [YOUR NEW REPOSITORY]
-# Manually update your package.json file
-```
+## Demo
+![](https://media.giphy.com/media/hQdEEYNowoFrESrjyT/giphy.gif) 
 
+
+## Usage
+
+Clone the repo and create your own git repo. 
 Install the dependencies and start the server.
 
-```
+
+WebSocket Server
+
+npm install
+npm start
+
+
+App server: 
 npm install
 npm start
 open http://localhost:3000
-```
 
 ### Static Files
 
