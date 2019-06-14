@@ -16,7 +16,7 @@ class App extends Component {
 
     this.sendMsg = this.sendMsg.bind(this);
   }
-
+  //client side server handling for Ws
   componentDidMount() {
     console.log("componentDidMount <App />");
     setTimeout(() => {
