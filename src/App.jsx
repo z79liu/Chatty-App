@@ -16,7 +16,7 @@ const App = () => {
     generateGreetingMessage();
     ws.current = new WebSocket("ws://localhost:3001");
     ws.current.onopen = () => console.log("Client opened");
-    ws.current.onclose = () => console.log("Client closed");
+    ws.current.onclose = () => console.log("Client leaving");
     ws.current.onmessage = e => socketOnMessage(e);
 
     return () => {
@@ -26,15 +26,14 @@ const App = () => {
 
   const generateGreetingMessage = () => {
     setTimeout(() => {
-      console.log("Simulating incoming message");
       const newMessage = {
         type: "incomingMessage",
         id: 3,
         username: "Admin Zeyu",
-        content: "Hello Welcome to my Chat app built on React and WebSocket!"
+        content: "Hello, Welcome to my Chat app built on React and WebSocket!"
       };
       setMessages([...messages, newMessage]);
-    }, 1500);
+    }, 1000);
   };
 
   const socketOnMessage = event => {
@@ -55,7 +54,7 @@ const App = () => {
         default:
           // show an error in the console if the message type is unknown
           _handleServerMessage(message);
-          // throw new Error("Unknown event type " + data.type);
+        // throw new Error("Unknown event type " + data.type);
       }
     }
   };
@@ -91,7 +90,7 @@ const App = () => {
       setCurrentUser("Anonymous");
     } else if (input !== currentUser) {
       const prevUserName = currentUser;
-      console.log('i am testtt', prevUserName)
+      console.log("i am testtt", prevUserName);
       const notif = {
         type: "postNotification",
         content: `${prevUserName} has changed their name to ${input}`

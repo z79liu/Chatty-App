@@ -22,7 +22,7 @@ const wss = new WebSocket.Server({ server });
 // Set up a callback that will run when a client connects to the server
 // When a client connects they are assigned a socket, represented by
 // the ws parameter in the callback.
-const colors = ["#006400", "#800000", "#000080", "#2F4F4F","#9ACD32", "#808080","#E9967A","#B0C4DE",]
+const colors = ["#006400", "#800000", "#000080", "#2F4F4F","#9ACD32", "#808080","#E9967A","#B0C4DE"]
 function getRandomInt(x, y) {
   return Math.floor(Math.random() * (y - x + 1)) + x;
 }
@@ -36,26 +36,25 @@ wss.broadcast = data => {
 };
 
 wss.on('connection', (ws) => {
-  console.log('current active sessions', wss.clients.size)
   console.log('Client connected');
   let activeUsers = { activeUsers: wss.clients.size }
   let color = { color: colors[getRandomInt(0, 7)] }
-  console.log('server generated a random color, it is:', color)
 
   ws.send(JSON.stringify(color));
   wss.broadcast(JSON.stringify(activeUsers))
+
 
   ws.on('message', data => {
     const json = JSON.parse(data)
     console.log('server received message', json)
     switch (json.type) {
       case "postMessage":
-        console.log(json.color)
         let objToBroadcast = { id: uuid(), type: "incomingMessage", username: json.username, content: json.content, colorz: json.color}
         wss.broadcast(JSON.stringify(objToBroadcast))
         break;
       case "postNotification":
         let objToBroadcast2 = { type: "incomingNotification", content: json.content }
+        console.log('yooooo',objToBroadcast2 )
         wss.broadcast(JSON.stringify(objToBroadcast2))
         break;
     }
@@ -65,6 +64,8 @@ wss.on('connection', (ws) => {
     let activeUsers = { activeUsers: wss.clients.size }
     console.log('Client disconnected remaining active users are:',activeUsers );
     wss.broadcast(JSON.stringify(activeUsers))
+    let objToBroadcast2 = { type: "incomingNotification", content: 'HEYYY' }
+    wss.broadcast(JSON.stringify(objToBroadcast2))
   })
 
 })
