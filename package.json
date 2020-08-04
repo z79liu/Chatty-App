@@ -50,6 +50,7 @@
     "concurrently": "^5.2.0",
     "react": "16.13.1",
     "react-dom": "16.13.1",
+    "socket.io-client": "^2.3.0",
     "uuid": "^3.4.0"
   }
 }

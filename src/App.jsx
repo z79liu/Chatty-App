@@ -1,137 +1,116 @@
-import React, { Component } from 'react';
-import ChatBar from './ChatBar.jsx'
-import MessageList from './MessageList.jsx'
-import NavBar from './NavBar.jsx'
+/* eslint-disable no-console */
+import React, { useEffect, useState, useRef } from "react";
+import ChatBar from "./ChatBar.jsx";
+import MessageList from "./MessageList.jsx";
+import NavBar from "./NavBar.jsx";
 
-class App extends Component {
-  constructor() {
-    super();
+const App = () => {
+  const ws = useRef(null);
+  const [currentUser, setCurrentUser] = useState("Anonymous");
+  const [messages, setMessages] = useState([]);
+  const [activeUsers, setActiveUsers] = useState(0);
+  const [color, setColor] = useState("");
 
-    this.state = {
-      currentUser: {}, // optional. if currentUser is not defined, it means the user is Anonymous
-      messages: [],
-      activeUsers: 0,
-      color: ""
-    }
+  //useEffect for componentdidmount
+  useEffect(() => {
+    generateGreetingMessage();
+    ws.current = new WebSocket("ws://localhost:3001");
+    ws.current.onopen = () => console.log("Client opened");
+    ws.current.onclose = () => console.log("Client closed");
+    ws.current.onmessage = e => socketOnMessage(e);
 
-    this.sendMsg = this.sendMsg.bind(this);
-  }
-  //client side server handling for Ws
-  componentDidMount() {
-    console.log("componentDidMount <App />");
+    return () => {
+      ws.current.close();
+    };
+  }, []);
+
+  const generateGreetingMessage = () => {
     setTimeout(() => {
       console.log("Simulating incoming message");
-      // Add a new message to the list of messages in the data store
-      const newMessage = { type: "incomingMessage", id: 3, username: "Zeyu", content: "Hello Welcome to my Chat app built on React and WebSocket!" };
-      const messages = this.state.messages.concat(newMessage)
-      // Update the state of the app component.
-      // Calling setState will trigger a call to render() in App and all child components.
-      this.setState({ messages: messages })
+      const newMessage = {
+        type: "incomingMessage",
+        id: 3,
+        username: "Admin Zeyu",
+        content: "Hello Welcome to my Chat app built on React and WebSocket!"
+      };
+      setMessages([...messages, newMessage]);
     }, 1500);
+  };
 
-    this.socket = new WebSocket('ws://localhost:3001');
-
-    // This event listener is fired when the socket is opened (i.e. connected)
-    this.socket.onopen = () => {
-      console.log('Connected to server');
-    };
-
-
-    // This event listener is fired whenever the socket receives a message from the server
-    // The parameter e is a MessageEvent which contains the message from the server along with some metadata.
-    this.socket.onmessage = (event) => {
-      console.log('server sent a message:',event)
-      const sessions = JSON.parse(event.data);
-      if (sessions.activeUsers) {
-        console.log('this is the current active users', sessions.activeUsers)
-        this._activeUsers(sessions.activeUsers)
-      } else if (sessions.color) {
-        console.log('got the color from server', sessions.color)
-        this._changecolor(sessions.color)
-      } 
-      else {
-        const message = JSON.parse(event.data);
-        console.log('this is the parsed response from server', message)
-        switch (message.type) {
-          case "incomingMessage":
-            this._handleServerMessage(message)
-            break;
-          case "incomingNotification":
-            this._handleServerNotification(message)
-            break;
-          default:
-            // show an error in the console if the message type is unknown
-            throw new Error("Unknown event type " + data.type);
-        }
+  const socketOnMessage = event => {
+    const sessions = JSON.parse(event.data);
+    if (sessions.activeUsers) {
+      _activeUsers(sessions.activeUsers);
+    } else if (sessions.color) {
+      _changecolor(sessions.color);
+    } else {
+      const message = JSON.parse(event.data);
+      switch (message.type) {
+        case "incomingMessage":
+          _handleServerMessage(message);
+          break;
+        case "incomingNotification":
+          _handleServerNotification(message);
+          break;
+        default:
+          // show an error in the console if the message type is unknown
+          _handleServerMessage(message);
+          // throw new Error("Unknown event type " + data.type);
       }
     }
+  };
 
-
-    // This event listener is fired when the socket is closed (either by us or the server)
-    this.onclose = () => {
-      console.log('Client disconnected');
+  const sendMsg = msg => {
+    const user = currentUser === undefined ? "Anonymous" : currentUser;
+    const newmsg = {
+      color: color,
+      type: "postMessage",
+      username: user,
+      content: msg
     };
-  }
-
-
-
-  render() {
-    return (
-      <div>
-        {/* <h1>Hello React :)</h1> */}
-        <NavBar activeUsers= {this.state.activeUsers}/>
-        <MessageList messageList={this.state.messages} color={this.state.color} />
-        <ChatBar nameChange={this.nameChange} sendMsg={this.sendMsg} currentUser={this.state.currentUser.name} />
-      </div>
-    );
-  }
-
-  sendMsg(msg) {
-    const user = this.state.currentUser.name === undefined ? "Anonymous" : this.state.currentUser.name
-    console.log('my name is', user)
-    const newmsg = { color: this.state.color, type: "postMessage", username: user, content: msg }
-    console.log(newmsg)
-    this.socket.send(JSON.stringify(newmsg));
-  }
-
-  _activeUsers = (users) => {
-    this.setState({ activeUsers: users });
-    console.log('current active users', this.state.activeUsers)
-  }
-  _changecolor = (color) => {
-    this.setState({ color: color });
-    console.log('setting the app state color to ', this.state.color)
-  }
-
-  _handleServerMessage = e => {
-    // TODO: Handle message from server
-    this.setState({ messages: [...this.state.messages, e] });
+    ws.current.send(JSON.stringify(newmsg));
   };
 
-  _handleServerNotification = e => {
-    // TODO: Handle message from server
-    this.setState({ messages: [...this.state.messages, e] });
+  const _activeUsers = users => {
+    setActiveUsers(users);
+  };
+  const _changecolor = color => {
+    setColor(color);
   };
 
-  // _systemnotif = e => {
-  //   const currentUser = this.state.currentUser.name === undefined ? "Anonymous" : this.state.currentUser.name
-  //   const newmsg = { type: "postNotification", username: e, content: msg}
-  //   this.socket.send(JSON.stringify(newmsg));
-  // }
+  const _handleServerMessage = newMessage => {
+    setMessages(messages => [...messages, newMessage]);
+  };
 
+  const _handleServerNotification = newMessage => {
+    setMessages(messages => [...messages, newMessage]);
+  };
 
-  nameChange = (input) => {
+  const nameChange = input => {
     if (input === "") {
-      this.setState({ currentUser: { name: "Anonymous" } })
-    } else if (input !== this.state.currentUser.name) {
-      const user = this.state.currentUser.name === undefined ? "Anonymous" : this.state.currentUser.name
-      const notif = { type: "postNotification", content: `${user} has changed their name to ${input}` }
-      this.socket.send(JSON.stringify(notif));
-      this.setState({ currentUser: { name: input } })
-    } else {
-
+      setCurrentUser("Anonymous");
+    } else if (input !== currentUser) {
+      const prevUserName = currentUser;
+      console.log('i am testtt', prevUserName)
+      const notif = {
+        type: "postNotification",
+        content: `${prevUserName} has changed their name to ${input}`
+      };
+      ws.current.send(JSON.stringify(notif));
+      setCurrentUser(input);
     }
-  }
+  };
 
-}
+  return (
+    <div>
+      <NavBar activeUsers={activeUsers} />
+      <MessageList messageList={messages} color={color} />
+      <ChatBar
+        nameChange={nameChange}
+        sendMsg={sendMsg}
+        currentUser={currentUser.name}
+      />
+    </div>
+  );
+};
 export default App;
