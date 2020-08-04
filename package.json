@@ -4,7 +4,9 @@
   "description": "Simple and lightweight Boilerplate for ReactJS projects",
   "scripts": {
     "lint": "eslint --ext .jsx,.js src",
-    "start": "node server.js"
+    "start": "npm i && node server.js",
+    "server": "node ./chatty_server/server.js",
+    "start:dev": "concurrently \"npm run start\" \"npm run server\""
   },
   "repository": {
     "type": "git",
@@ -37,16 +39,17 @@
     "css-loader": "0.26.1",
     "eslint": "3.15.0",
     "eslint-plugin-react": "6.9.0",
-    "node-sass": "4.5.0",
+    "node-sass": "^4.14.1",
     "sass-loader": "6.0.0",
-    "sockjs-client": "^1.1.2",
+    "sockjs-client": "^1.5.0",
     "style-loader": "0.13.1",
     "webpack": "2.2.1",
     "webpack-dev-server": "2.3.0"
   },
   "dependencies": {
-    "react": "15.4.2",
-    "react-dom": "15.4.2",
-    "uuid": "^3.3.2"
+    "concurrently": "^5.2.0",
+    "react": "16.13.1",
+    "react-dom": "16.13.1",
+    "uuid": "^3.4.0"
   }
 }

@@ -3,6 +3,11 @@ Chat App
 
 A client-side SPA (single-page app) built with ReactJS, Webpack, Babel, Node.js and Web Sockets. The client-side app communicates with a server via WebSockets for multi-user real-time updates. No persistent database is involved; the focus is on the client-side experience and using ReactJS for real time updates.
 
+## Start:
+1. npm install
+2. npm run start:dev
+
+
 ## Features
 When any connected user sends a chat message, all connected users receive and display the message
 When any connected user changes their name, all connected users are notified of the name change
